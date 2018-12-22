@@ -12,11 +12,10 @@ using Logger = BepInEx.Logger;
 
 namespace Kanro.MaidTranslate
 {
-    [BepInPlugin(GUID: "MaidTranslate", Name: "Kanro.ObjectControl", Version: "0.1")]
+    [BepInPlugin(GUID: "MaidTranslate", Name: "Kanro.ObjectControl", Version: "0.2")]
     public class ObjectControl : BaseUnityPlugin
     {
-        private bool showingUI = true;
-        public static string TotalLog = "";
+        private bool showingUI = false;
         private Rect UI = new Rect(120, 600, 500, 400);
         private Vector2 scrollPosition = Vector2.zero;
         private Vector2 scrollPosition2 = Vector2.zero;

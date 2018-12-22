@@ -13,7 +13,7 @@ namespace Kanro.MaidTranslate
         public TranslateConfig(MaidTranslate plugin)
         {
             Config.SaveOnConfigSet = true;
-            _isDumpingTextWrapper = new ConfigWrapper<bool>(nameof(IsDumpingText), plugin, true);
+            _isDumpingTextWrapper = new ConfigWrapper<bool>(nameof(IsDumpingText), plugin);
             _isDumpingTextureWrapper = new ConfigWrapper<bool>(nameof(IsDumpingTexture), plugin);
             _isDumpingUiWrapper = new ConfigWrapper<bool>(nameof(IsDumpingUI), plugin);
             _isDumpingSpriteWrapper = new ConfigWrapper<bool>(nameof(IsDumpingSprite), plugin);
