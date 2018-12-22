@@ -57,6 +57,7 @@
     <Compile Include="Hook\TextSource.cs" />
     <Compile Include="Hook\TextureType.cs" />
     <Compile Include="Hook\YotogiKagHitRetEventArgs.cs" />
+    <Compile Include="MaidDebug.cs" />
     <Compile Include="MaidTranslate.cs" />
     <Compile Include="ObjectControl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

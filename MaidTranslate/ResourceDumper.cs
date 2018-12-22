@@ -25,6 +25,8 @@ namespace Kanro.MaidTranslate
 
         private HashSet<string> TextureDumpCache = new HashSet<string>();
 
+        private HashSet<string> TextDumpCache = new HashSet<string>();
+
         private TranslateConfig _config;
 
         private TextWriter _textDumpingFile;
@@ -62,7 +64,9 @@ namespace Kanro.MaidTranslate
                 return;
             }
 
-            if (e.Translation != null)
+            var key = scene != null ? $"[{scene.Value.name}]{e.Text}" : e.Text;
+
+            if (TextDumpCache.Contains(key))
             {
                 return;
             }
@@ -105,6 +109,8 @@ namespace Kanro.MaidTranslate
 
                 TextDumpingFile.Flush();
             }
+
+            TextDumpCache.Add(key);
         }
 
         public void DumpResource(Scene? scene)

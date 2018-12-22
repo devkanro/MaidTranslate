@@ -79,15 +79,15 @@ namespace Kanro.MaidTranslate
                         break;
                     case KeyCode.F6:
                         Config.IsDumpingTexture = !Config.IsDumpingTexture;
-                        Logger.Log(LogLevel.Info, $"[MaidTranslate] Dumping texture {(Config.IsDumpingText ? "Enabled" : "Disabled")}.");
+                        Logger.Log(LogLevel.Info, $"[MaidTranslate] Dumping texture {(Config.IsDumpingTexture ? "Enabled" : "Disabled")}.");
                         break;
                     case KeyCode.F7:
                         Config.IsDumpingUI = !Config.IsDumpingUI;
-                        Logger.Log(LogLevel.Info, $"[MaidTranslate] Dumping ui {(Config.IsDumpingText ? "Enabled" : "Disabled")}.");
+                        Logger.Log(LogLevel.Info, $"[MaidTranslate] Dumping ui {(Config.IsDumpingUI ? "Enabled" : "Disabled")}.");
                         break;
                     case KeyCode.F8:
                         Config.IsDumpingSprite = !Config.IsDumpingSprite;
-                        Logger.Log(LogLevel.Info, $"[MaidTranslate] Dumping sprite {(Config.IsDumpingText ? "Enabled" : "Disabled")}.");
+                        Logger.Log(LogLevel.Info, $"[MaidTranslate] Dumping sprite {(Config.IsDumpingSprite ? "Enabled" : "Disabled")}.");
                         break;
 
                     case KeyCode.F9:
@@ -165,6 +165,7 @@ namespace Kanro.MaidTranslate
                 }
                 else
                 {
+                    e.Translation = result;
                     Dumper.DumpText(CurrentScene, sender, e);
                 }
             }

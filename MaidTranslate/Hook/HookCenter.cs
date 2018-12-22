@@ -298,5 +298,10 @@ namespace Kanro.MaidTranslate.Hook
         public static event EventHandler<YotogiKagHitRetEventArgs> YotogiKagHitRet;
 
         public static event EventHandler PlaySound;
+
+        public static void InvokeTextTranslation(object sender, TextTranslationEventArgs e)
+        {
+            TextTranslation?.Invoke(sender, e);
+        }
     }
 }

@@ -9,24 +9,23 @@ namespace Kanro.MaidTranslate.Translation
         private Dictionary<string, HashSet<TextTranslation>> RawSpacial { get; } =
             new Dictionary<string, HashSet<TextTranslation>>();
         private HashSet<TextTranslation> RegexSpacial { get; } = new HashSet<TextTranslation>();
-        private NameTextTranslationPool NamePool { get; } = new NameTextTranslationPool();
+        public NameTextTranslationPool NamePool { get; } = new NameTextTranslationPool();
 
         public bool Translate(Scene? scene, object source, TextTranslationEventArgs e, out string translate)
         {
-            var original = e.Text;
-            if (NamePool.Translate(scene, source, e, out var temp))
+            if (NamePool.Translate(scene, source, e, e.Text, out var result))
             {
-                original = temp;
+                translate = result;
+                return true;
             }
 
-            string result = null;
-            if (RawSpacial.TryGetValue(original, out var translations))
+            if (RawSpacial.TryGetValue(e.Text, out var translations))
             {
                 if (translations.Count > 0)
                 {
                     foreach (var textTranslation in translations)
                     {
-                        if (!textTranslation.Translate(scene, source, e, original, out result)) continue;
+                        if (!textTranslation.Translate(scene, source, e, e.Text, out result)) continue;
 
                         translate = result;
                         return true;
@@ -36,7 +35,7 @@ namespace Kanro.MaidTranslate.Translation
 
             foreach (var textTranslation in RegexSpacial)
             {
-                if (!textTranslation.Translate(scene, source, e, original, out result)) continue;
+                if (!textTranslation.Translate(scene, source, e, e.Text, out result)) continue;
 
                 translate = result;
                 return true;

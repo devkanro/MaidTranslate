@@ -62,7 +62,7 @@ namespace Kanro.MaidTranslate.Translation
                 return true;
             }
 
-            translate = null;
+            translate = temp;
             return false;
         }
 
@@ -88,27 +88,6 @@ namespace Kanro.MaidTranslate.Translation
 
         public void LoadTranslationPack()
         {
-            if (TranslatePackDomain != null)
-            {
-                AppDomain.Unload(TranslatePackDomain);
-            }
-
-            TranslatePackDomain = AppDomain.CreateDomain("MaidTranslatePackDoamin");
-
-            var packFiles = Directory.GetFiles(TranslationPackDir, "*.dll", SearchOption.AllDirectories);
-            foreach (var file in packFiles)
-            {
-                var assembly = TranslatePackDomain.Load(Path.GetFullPath(file));
-                var names = assembly.GetManifestResourceNames();
-
-                foreach (var name in names)
-                {
-                    Logger.Log(LogLevel.Debug, $"[MaidTranslate] Resource in {name} translate pack loaded.");
-                }
-            }
-
-            AppDomain.Unload(TranslatePackDomain);
-            TranslatePackDomain = null;
         }
 
         public void LoadTextTranslation()
@@ -121,7 +100,8 @@ namespace Kanro.MaidTranslate.Translation
             foreach (var file in translationFiles)
             {
                 var lines = File.ReadAllLines(file);
-                var translation = new TextTranslation();
+                var baseTranslation = new TextTranslation(textPool.NamePool);
+                var translation = baseTranslation.Clone();
 
                 foreach (var line in lines)
                 {
@@ -132,7 +112,7 @@ namespace Kanro.MaidTranslate.Translation
                             textPool.AddTranslation(translation);
                             count++;
                         }
-                        translation = new TextTranslation();
+                        translation = baseTranslation.Clone();
                         continue;
                     }
 
@@ -140,76 +120,22 @@ namespace Kanro.MaidTranslate.Translation
                     {
                         case '#':
                             break;
+                        case '&':
+                            ConfigTranslationSetting(baseTranslation, line.Substring(1));
+                            ConfigTranslationSetting(translation, line.Substring(1));
+                            break;
+                        case '%':
+                            baseTranslation = new TextTranslation(textPool.NamePool);
+                            break;
                         case '*':
-                            var data = line.Substring(1).Split(new[]{':'}, 2);
-                            if (data.Length == 2)
-                            {
-                                switch (data[0])
-                                {
-                                    case "type":
-                                        foreach (var type in data[1].Split(','))
-                                        {
-                                            try
-                                            {
-                                                translation.Type.Add(
-                                                    (TextType) Enum.Parse(typeof(TextType), type, true));
-                                            }
-                                            catch
-                                            {
-                                                // Ignore
-                                            }
-                                        }
-                                        break;
-                                    case "source":
-                                        foreach (var source in data[1].Split(','))
-                                        {
-                                            try
-                                            {
-                                                translation.Source.Add(
-                                                    (TextSource)Enum.Parse(typeof(TextSource), source, true));
-                                            }
-                                            catch
-                                            {
-                                                // Ignore
-                                            }
-                                        }
-                                        break;
-                                    case "scene":
-                                        foreach (var scene in data[1].Split(','))
-                                        {
-                                            translation.Scene.Add(scene);
-                                        }
-                                        break;
-                                    case "level":
-                                        foreach (var level in data[1].Split(','))
-                                        {
-                                            if (int.TryParse(level, out var result))
-                                            {
-                                                translation.Level.Add(result);
-                                            }
-                                        }
-                                        break;
-                                    case "objectName":
-                                        foreach (var name in data[1].Split(','))
-                                        {
-                                            translation.ObjectName.Add(name);
-                                        }
-                                        break;
-                                    case "objectId":
-                                        foreach (var id in data[1].Split(','))
-                                        {
-                                            translation.ObjectId.Add(id);
-                                        }
-                                        break;
-                                }
-                            }
+                            ConfigTranslationSetting(translation, line.Substring(1));
                             break;
                         case '-':
                             translation.Original = line.Substring(1).Unescape();
                             translation.Flag |= TextTranslationFlag.TextPart;
                             break;
                         case '+':
-                            translation.Regex = new Regex(line.Substring(1), RegexOptions.Compiled);
+                            translation.Regex = new Regex($"^{line.Substring(1)}$", RegexOptions.Compiled);
                             translation.Flag |= TextTranslationFlag.Regex;
                             translation.Flag |= TextTranslationFlag.TextPart;
                             break;
@@ -217,7 +143,7 @@ namespace Kanro.MaidTranslate.Translation
                             translation.Original = line.Substring(1).Unescape();
                             break;
                         case '$':
-                            translation.Regex = new Regex(line.Substring(1), RegexOptions.Compiled);
+                            translation.Regex = new Regex($"^{line.Substring(1)}$", RegexOptions.Compiled);
                             translation.Flag |= TextTranslationFlag.Regex;
                             break;
                         case '<':
@@ -237,6 +163,72 @@ namespace Kanro.MaidTranslate.Translation
 
             TextTranslationPool = textPool;
             Logger.Log(LogLevel.Debug, $"[MaidTranslate] {count} text translation loaded.");
+        }
+
+        private void ConfigTranslationSetting(TextTranslation translation, string value)
+        {
+            var data = value.Split(new[] { ':' }, 2);
+            if (data.Length == 2)
+            {
+                switch (data[0])
+                {
+                    case "type":
+                        foreach (var type in data[1].Split(','))
+                        {
+                            try
+                            {
+                                translation.Type.Add(
+                                    (TextType)Enum.Parse(typeof(TextType), type, true));
+                            }
+                            catch
+                            {
+                                // Ignore
+                            }
+                        }
+                        break;
+                    case "source":
+                        foreach (var source in data[1].Split(','))
+                        {
+                            try
+                            {
+                                translation.Source.Add(
+                                    (TextSource)Enum.Parse(typeof(TextSource), source, true));
+                            }
+                            catch
+                            {
+                                // Ignore
+                            }
+                        }
+                        break;
+                    case "scene":
+                        foreach (var scene in data[1].Split(','))
+                        {
+                            translation.Scene.Add(scene);
+                        }
+                        break;
+                    case "level":
+                        foreach (var level in data[1].Split(','))
+                        {
+                            if (int.TryParse(level, out var result))
+                            {
+                                translation.Level.Add(result);
+                            }
+                        }
+                        break;
+                    case "objectName":
+                        foreach (var name in data[1].Split(','))
+                        {
+                            translation.ObjectName.Add(name);
+                        }
+                        break;
+                    case "objectId":
+                        foreach (var id in data[1].Split(','))
+                        {
+                            translation.ObjectId.Add(id);
+                        }
+                        break;
+                }
+            }
         }
 
         public void LoadResourceTranslation()

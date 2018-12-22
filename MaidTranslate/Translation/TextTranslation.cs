@@ -1,5 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 using System.Text.RegularExpressions;
+using BepInEx;
+using BepInEx.Logging;
 using Kanro.MaidTranslate.Hook;
 using UnityEngine.SceneManagement;
 
@@ -7,6 +10,13 @@ namespace Kanro.MaidTranslate.Translation
 {
     public class TextTranslation
     {
+        public TextTranslation(NameTextTranslationPool namePool)
+        {
+            NamePool = namePool;
+        }
+
+        public NameTextTranslationPool NamePool { get; }
+
         public string Original { get; set; }
 
         public Regex Regex { get; set; }
@@ -113,36 +123,137 @@ namespace Kanro.MaidTranslate.Translation
                 }
             }
 
-            if ((Flag & TextTranslationFlag.Regex) > TextTranslationFlag.None)
+            if ((Flag & TextTranslationFlag.TextPart) > TextTranslationFlag.None)
             {
-                if (!Regex.IsMatch(original))
+                if ((Flag & TextTranslationFlag.Regex) > TextTranslationFlag.None)
                 {
-                    translate = null;
-                    return false;
-                }
+                    if (!Regex.IsMatch(original))
+                    {
+                        translate = null;
+                        return false;
+                    }
 
-                translate = Regex.Replace(original, Translation);
-                return true;
-            }
-            else if ((Flag & TextTranslationFlag.TextPart) > TextTranslationFlag.TextPart)
-            {
-                if (!original.Contains(Original))
+                    translate = Regex.Replace(original, Translation);
+                    if (e.Debug) Logger.Log(LogLevel.Info, $"[TranslateDebug] TextPart {original} >> {translate}");
+                    return true;
+                }
+                else
                 {
-                    translate = null;
-                    return false;
+                    if (original != Original)
+                    {
+                        translate = null;
+                        return false;
+                    }
+
+                    translate = Translation;
+                    if (e.Debug) Logger.Log(LogLevel.Info, $"[TranslateDebug] TextPart {original} >> {translate}");
+                    return true;
                 }
-
-                translate = original.Replace(Original, Translation);
-                return true;
             }
-            else if (Original == original)
+            else
             {
-                translate = Translation;
-                return true;
+                if ((Flag & TextTranslationFlag.Regex) > TextTranslationFlag.None)
+                {
+                    var matches = Regex.Matches(original);
+
+                    if (matches.Count == 0)
+                    {
+                        translate = null;
+                        return false;
+                    }
+
+                    var originalTemp = new StringBuilder(original, 32);
+
+                    foreach (Match match in matches)
+                    {
+                        var raw = match.Value;
+                        var translateTemp = new StringBuilder(Translation, 32);
+
+                        for (var i = match.Groups.Count - 1; i >= 0; i--)
+                        {
+                            var group = match.Groups[i];
+                            if (!NamePool.Translate(scene, source, e, group.Value, out var groupValue))
+                            {
+                                groupValue = group.Value;
+                            }
+
+                            translateTemp = translateTemp.Replace($"${i}", groupValue);
+                            translateTemp = translateTemp.Replace($"${{{i}}}", groupValue);
+                        }
+
+                        foreach (var name in Regex.GetGroupNames())
+                        {
+                            var group = match.Groups[name];
+                            if (!NamePool.Translate(scene, source, e, group.Value, out var groupValue))
+                            {
+                                groupValue = group.Value;
+                            }
+
+                            translateTemp = translateTemp.Replace($"${{{name}}}", groupValue);
+                        }
+
+                        originalTemp = originalTemp.Replace(raw, translateTemp.ToString(), match.Index, match.Length);
+                    }
+
+                    translate = originalTemp.ToString();
+                    if (e.Debug) Logger.Log(LogLevel.Info, $"[TranslateDebug] {original} >> {translate}");
+                    return true;
+                }
+                else
+                {
+                    if (original != Original)
+                    {
+                        translate = null;
+                        return false;
+                    }
+
+                    translate = Translation;
+                    if (e.Debug) Logger.Log(LogLevel.Info, $"[TranslateDebug] {original} >> {translate}");
+                    return true;
+                }
+            }
+        }
+
+        public TextTranslation Clone()
+        {
+            var result = new TextTranslation(NamePool){
+                Original = Original,
+                Regex = Regex,
+                Translation = Translation,
+                Flag = Flag,
+            };
+
+            foreach (var value in Scene)
+            {
+                result.Scene.Add(value);
             }
 
-            translate = null;
-            return false;
+            foreach (var value in Level)
+            {
+                result.Level.Add(value);
+            }
+
+            foreach (var value in ObjectName)
+            {
+                result.ObjectName.Add(value);
+            }
+
+            foreach (var value in ObjectId)
+            {
+                result.ObjectId.Add(value);
+            }
+
+            foreach (var value in Type)
+            {
+                result.Type.Add(value);
+            }
+
+            foreach (var value in Source)
+            {
+                result.Source.Add(value);
+            }
+
+            return result;
         }
     }
 }

@@ -4,6 +4,7 @@ namespace Kanro.MaidTranslate.Hook
 {
     public class TextTranslationEventArgs : EventArgs
     {
+        public bool Debug { get; set; } = false;
         public TextSource Source { get; }
         public string Text { get; set; }
         public string Translation { get; set; }
