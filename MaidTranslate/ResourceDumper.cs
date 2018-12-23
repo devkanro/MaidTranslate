@@ -76,10 +76,17 @@ namespace Kanro.MaidTranslate
                 return;
             }
 
-            lock (TextDumpingFile)
+            var objectName = (source as UnityEngine.Object)?.name;
+            var objectId = (source as UnityEngine.Object)?.GetInstanceID();
+
+            if (objectId == 178854 && objectName == "Message" && e.Type == TextType.UiLabel)
             {
-                var objectName = (source as UnityEngine.Object)?.name;
-                var objectId = (source as UnityEngine.Object)?.GetInstanceID();
+                // Skip for adv text
+                return;
+            }
+
+            lock (TextDumpingFile)
+            {   
 
                 TextDumpingFile.WriteLine($"*type:{e.Type}");
                 TextDumpingFile.WriteLine($"*source:{e.Source}");
