@@ -18,7 +18,7 @@ namespace Kanro.MaidTranslate.Translation
 
         public void AddResource(string path)
         {
-            var name = Path.GetFileNameWithoutExtension(path);
+            var name = Path.GetFileNameWithoutExtension(path).ToLower();
             if (Resource.ContainsKey(name))
             {
                 Logger.Log(LogLevel.Debug, $"[MaidTranslate] Same name resource of {name} found, use the latest version.");
@@ -29,9 +29,10 @@ namespace Kanro.MaidTranslate.Translation
 
         public bool Translate(Scene? scene, TextureTranslationEventArgs e, out TextureResource resource)
         {
-            if (Resource.ContainsKey(e.Name))
+            var name = e.Name.ToLower();
+            if (Resource.ContainsKey(name))
             {
-                var translationFile = Resource[e.Name];
+                var translationFile = Resource[name];
 
                 switch (Path.GetExtension(translationFile))
                 {
