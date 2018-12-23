@@ -33,9 +33,11 @@ namespace Kanro.MaidTranslate
 
         private Dictionary<string, string> VoiceCache { get; } = new Dictionary<string, string>();
 
-        private Dictionary<string, AudioSource> PlayingAudioSource { get; } = new Dictionary<string, AudioSource>();
+        public Dictionary<string, AudioSource> PlayingAudioSource { get; } = new Dictionary<string, AudioSource>();
+
+        private LinkedList<string> PlayingAudio { get; } = new LinkedList<string>();
+
         private HashSet<string> StoppedAudio { get; } = new HashSet<string>();
-        private HashSet<string> RenderingVoice { get; } = new HashSet<string>();
 
         private Rect _lastArea;
 
@@ -71,6 +73,11 @@ namespace Kanro.MaidTranslate
                 {
                     Logger.Log(LogLevel.Debug, $"[YotogiSubtitles] Now playing {audioManager.FileName}");
                     PlayingAudioSource[audioManager.FileName] = audioManager.audiosource;
+                    if (PlayingAudio.Contains(audioManager.FileName))
+                    {
+                        PlayingAudio.Remove(audioManager.FileName);
+                    }
+                    PlayingAudio.AddFirst(audioManager.FileName);
                 }
             }
             catch (Exception ex)
@@ -159,6 +166,18 @@ namespace Kanro.MaidTranslate
                     Config.EnableSubtitle = !Config.EnableSubtitle;
                     Logger.Log(LogLevel.Info, $"[YotogiSubtitles] Subtitles {(Config.EnableSubtitle ? "Enabled" : "Disabled")}.");
                     break;
+                case KeyCode.Keypad1:
+                    lock (PlayingAudioSource)
+                    {
+                        var index = 0;
+                        foreach (var audioFileName in PlayingAudio)
+                        {
+                            var audioSource = PlayingAudioSource[audioFileName];
+                            Logger.Log(LogLevel.Debug, $"[YotogiSubtitles] {index} : Now playing {audioFileName}({audioSource.isPlaying})");
+                            index++;
+                        }
+                    }
+                    break;
             }
         }
 
@@ -228,29 +247,33 @@ namespace Kanro.MaidTranslate
                 lock (PlayingAudioSource)
                 {
                     var rendered = 0;
-                    foreach (var audioSource in PlayingAudioSource)
+                    foreach (var audioFileName in PlayingAudio)
                     {
-                        if (!audioSource.Value.isPlaying)
+                        if (!PlayingAudioSource.TryGetValue(audioFileName, out var audioSource))
                         {
-                            StoppedAudio.Add(audioSource.Key);
                             continue;
                         }
 
-                        if (!VoiceCache.ContainsKey(audioSource.Key)) continue;
+                        if (!audioSource.isPlaying)
+                        {
+                            StoppedAudio.Add(audioFileName);
+                            continue;
+                        }
+
+                        if (!VoiceCache.ContainsKey(audioFileName)) continue;
 
                         if (Config.MaxSubtitle > 0 && rendered >= Config.MaxSubtitle) continue;
-
-                        RenderingVoice.Add(audioSource.Key);
-                        GUILayout.Box(VoiceCache[audioSource.Key], BoxStyle);
+                        
+                        GUILayout.Box(VoiceCache[audioFileName], BoxStyle);
                         rendered++;
                     }
 
                     foreach (var audioSource in StoppedAudio)
                     {
+                        Logger.Log(LogLevel.Debug, $"[YotogiSubtitles] {audioSource} Stopped.");
                         PlayingAudioSource.Remove(audioSource);
                     }
                     StoppedAudio.Clear();
-                    RenderingVoice.Clear();
                 }
                 GUILayout.EndArea();
             }
