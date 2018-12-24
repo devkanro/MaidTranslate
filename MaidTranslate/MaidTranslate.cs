@@ -13,7 +13,7 @@ using Logger = BepInEx.Logger;
 
 namespace Kanro.MaidTranslate
 {
-    [BepInPlugin(GUID: "MaidTranslate", Name: "Kanro.MaidTranslate", Version: "0.2")]
+    [BepInPlugin(GUID: "MaidTranslate", Name: "Kanro.MaidTranslate", Version: "0.3")]
     public class MaidTranslate : BaseUnityPlugin
     {
         public TranslateConfig Config { get; }

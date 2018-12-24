@@ -12,7 +12,7 @@ using Logger = BepInEx.Logger;
 
 namespace Kanro.MaidTranslate
 {
-    [BepInPlugin(GUID: "MaidTranslate", Name: "Kanro.YotogiSubtitles", Version: "0.2")]
+    [BepInPlugin(GUID: "MaidTranslate", Name: "Kanro.YotogiSubtitles", Version: "0.3")]
     public class YotogiSubtitles : BaseUnityPlugin
     {
         public YotogiSubtitles()
