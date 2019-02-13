@@ -64,7 +64,7 @@ namespace Kanro.MaidTranslate
                     return;
                 }
 
-                if (audioManager.SoundType != AudioSourceMgr.Type.Voice)
+                if (audioManager.SoundType != AudioSourceMgr.Type.VoiceHeroine)
                 {
                     return;
                 }
