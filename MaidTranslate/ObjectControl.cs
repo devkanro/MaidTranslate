@@ -8,11 +8,10 @@ using Kanro.MaidTranslate.Hook;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
-using Logger = BepInEx.Logger;
 
 namespace Kanro.MaidTranslate
 {
-    [BepInPlugin(GUID: "MaidTranslate", Name: "Kanro.ObjectControl", Version: "0.3")]
+    [BepInPlugin(GUID: "ObjectControl", Name: "Kanro.ObjectControl", Version:"5.0")]
     public class ObjectControl : BaseUnityPlugin
     {
         private bool showingUI = false;

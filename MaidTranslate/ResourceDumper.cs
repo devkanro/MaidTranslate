@@ -9,12 +9,12 @@ using Kanro.MaidTranslate.Hook;
 using Kanro.MaidTranslate.Util;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Logger = BepInEx.Logger;
 
 namespace Kanro.MaidTranslate
 {
     public class ResourceDumper : IDisposable
     {
+        private static readonly ManualLogSource Logger = BepInEx.Logging.Logger.CreateLogSource("ResourceDumper");
         private static readonly string DumpDir = @"BepInEx\MaidTranslate\Dumps";
         private static readonly string TextDumpDir = $"{DumpDir}\\Text";
         private static readonly string TextureDumpDir = $"{DumpDir}\\Texture";
@@ -38,7 +38,7 @@ namespace Kanro.MaidTranslate
                 if (_textDumpingFile == null)
                 {
                     var dumpFile = $"{TextDumpDir}\\{DateTime.Now:yyyy-MM-dd HH.mm.ss.fff}.txt";
-                    Logger.Log(LogLevel.Debug, $"[ResourceDumper] Text dumping started in '{dumpFile}'.");
+                    Logger.Log(LogLevel.Debug, $"Text dumping started in '{dumpFile}'.");
                     _textDumpingFile = File.CreateText(dumpFile);
                 }
 
@@ -143,7 +143,7 @@ namespace Kanro.MaidTranslate
                     }
 
                     DumpTexture2D((Texture2D)texture, Path.Combine(scenePath, texture.name + ".png"));
-                    Logger.Log(LogLevel.Debug, $"[ResourceDumper] Resource '{texture.name}' dumped.");
+                    Logger.Log(LogLevel.Debug, $"Resource '{texture.name}' dumped.");
                 }
                 catch (Exception ex)
                 {

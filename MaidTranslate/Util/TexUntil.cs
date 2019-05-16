@@ -5,12 +5,12 @@ using System.Linq;
 using System.Text;
 using BepInEx.Logging;
 using UnityEngine;
-using Logger = BepInEx.Logger;
 
 namespace Kanro.MaidTranslate.Util
 {
     public static class TexUntil
     {
+        private static readonly ManualLogSource Logger = BepInEx.Logging.Logger.CreateLogSource("TexUntil");
         public static TextureResource LoadTexture(string name, byte[] data)
         {
             var binaryReader = new BinaryReader(new MemoryStream(data), Encoding.UTF8);

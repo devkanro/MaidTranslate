@@ -10,6 +10,8 @@ namespace Kanro.MaidTranslate.Translation
 {
     public class TextTranslation
     {
+        private static readonly ManualLogSource Logger = BepInEx.Logging.Logger.CreateLogSource("TextTranslation");
+
         public TextTranslation(NameTextTranslationPool namePool)
         {
             NamePool = namePool;
@@ -134,7 +136,7 @@ namespace Kanro.MaidTranslate.Translation
                     }
 
                     translate = Regex.Replace(original, Translation);
-                    if (e.Debug) Logger.Log(LogLevel.Info, $"[TranslateDebug] TextPart {original} >> {translate}");
+                    if (e.Debug) Logger.Log(LogLevel.Info, $"TextPart {original} >> {translate}");
                     return true;
                 }
                 else
@@ -146,7 +148,7 @@ namespace Kanro.MaidTranslate.Translation
                     }
 
                     translate = Translation;
-                    if (e.Debug) Logger.Log(LogLevel.Info, $"[TranslateDebug] TextPart {original} >> {translate}");
+                    if (e.Debug) Logger.Log(LogLevel.Info, $"TextPart {original} >> {translate}");
                     return true;
                 }
             }
@@ -196,7 +198,7 @@ namespace Kanro.MaidTranslate.Translation
                     }
 
                     translate = originalTemp.ToString();
-                    if (e.Debug) Logger.Log(LogLevel.Info, $"[TranslateDebug] {original} >> {translate}");
+                    if (e.Debug) Logger.Log(LogLevel.Info, $"{original} >> {translate}");
                     return true;
                 }
                 else
@@ -208,7 +210,7 @@ namespace Kanro.MaidTranslate.Translation
                     }
 
                     translate = Translation;
-                    if (e.Debug) Logger.Log(LogLevel.Info, $"[TranslateDebug] {original} >> {translate}");
+                    if (e.Debug) Logger.Log(LogLevel.Info, $"{original} >> {translate}");
                     return true;
                 }
             }

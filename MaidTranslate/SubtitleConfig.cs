@@ -1,20 +1,26 @@
 ﻿using System;
 using BepInEx;
+using BepInEx.Configuration;
 
 namespace Kanro.MaidTranslate
 {
     public class SubtitleConfig
     {
-        public SubtitleConfig(YotogiSubtitles plugin)
+        public SubtitleConfig(ConfigFile config)
         {
-            Config.SaveOnConfigSet = true;
-            _enableSubtitleWrapper = new ConfigWrapper<bool>(nameof(EnableSubtitle), plugin, true);
-            _maxSubtitleWrapper = new ConfigWrapper<int>(nameof(MaxSubtitle), plugin, -1);
+            _config = config;
+            _config.SaveOnConfigSet = true;
+            _enableSubtitleWrapper = config.Wrap(nameof(SubtitleConfig), nameof(EnableSubtitle), "Enable yotogi subtitle",true);
+            _maxSubtitleWrapper = config.Wrap(nameof(SubtitleConfig), nameof(MaxSubtitle), "Max shown subtitles", -1);
+
+            _enableSubtitleWrapper.Value = _enableSubtitleWrapper.Value;
+            _maxSubtitleWrapper.Value = _maxSubtitleWrapper.Value;
 
             _enableSubtitle = _enableSubtitleWrapper.Value;
             _maxSubtitle = _maxSubtitleWrapper.Value;
         }
-        
+
+        private readonly ConfigFile _config;
         private readonly ConfigWrapper<bool> _enableSubtitleWrapper;
         private readonly ConfigWrapper<int> _maxSubtitleWrapper;
         
@@ -35,7 +41,7 @@ namespace Kanro.MaidTranslate
 
         public void Reload()
         {
-            Config.ReloadConfig();
+            _config.Reload();
             EnableSubtitle = _enableSubtitleWrapper.Value;
             MaxSubtitle = _maxSubtitleWrapper.Value;
         }

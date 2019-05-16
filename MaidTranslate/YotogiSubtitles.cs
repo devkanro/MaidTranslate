@@ -8,24 +8,23 @@ using Kanro.MaidTranslate.Hook;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using Logger = BepInEx.Logger;
 
 namespace Kanro.MaidTranslate
 {
-    [BepInPlugin(GUID: "MaidTranslate", Name: "Kanro.YotogiSubtitles", Version: "0.3")]
+    [BepInPlugin(GUID: "YotogiSubtitles", Name: "Kanro.YotogiSubtitles", Version:"5.0")]
     public class YotogiSubtitles : BaseUnityPlugin
     {
         public YotogiSubtitles()
         {
-            Config = new SubtitleConfig(this);
+            SubtitleConfig = new SubtitleConfig(Config);
 
-            Logger.Log(LogLevel.Debug, $"[YotogiSubtitles] Subtitles {(Config.EnableSubtitle ? "Enabled" : "Disabled")}.");
-            Logger.Log(LogLevel.Debug, $"[YotogiSubtitles] Max subtitles {Config.MaxSubtitle }.");
+            Logger.Log(LogLevel.Debug, $"Subtitles {(SubtitleConfig.EnableSubtitle ? "Enabled" : "Disabled")}.");
+            Logger.Log(LogLevel.Debug, $"Max subtitles {SubtitleConfig.MaxSubtitle }.");
         }
 
         private bool isInVR;
 
-        private SubtitleConfig Config { get; }
+        private SubtitleConfig SubtitleConfig { get; }
 
         private Scene CurrentScene { get; set; }
 
@@ -47,7 +46,7 @@ namespace Kanro.MaidTranslate
         {
             try
             {
-                if (!Config.EnableSubtitle)
+                if (!SubtitleConfig.EnableSubtitle)
                 {
                     return;
                 }
@@ -71,7 +70,7 @@ namespace Kanro.MaidTranslate
 
                 lock (PlayingAudioSource)
                 {
-                    Logger.Log(LogLevel.Debug, $"[YotogiSubtitles] Now playing {audioManager.FileName}");
+                    Logger.Log(LogLevel.Debug, $"Now playing {audioManager.FileName}");
                     PlayingAudioSource[audioManager.FileName] = audioManager.audiosource;
                     if (PlayingAudio.Contains(audioManager.FileName))
                     {
@@ -106,7 +105,7 @@ namespace Kanro.MaidTranslate
                 HookCenter.PlaySound += OnPlaySound;
                 SceneManager.sceneLoaded += OnSceneLoaded;
                 isInVR = Environment.GetCommandLineArgs().Any(s => s.ToLower().Contains("/vr"));
-                Logger.Log(LogLevel.Debug, $"[YotogiSubtitles] Initialized");
+                Logger.Log(LogLevel.Debug, $"Initialized");
             }
             catch (Exception ex)
             {
@@ -119,7 +118,7 @@ namespace Kanro.MaidTranslate
         {
             try
             {
-                if (!Config.EnableSubtitle)
+                if (!SubtitleConfig.EnableSubtitle)
                 {
                     return;
                 }
@@ -133,7 +132,7 @@ namespace Kanro.MaidTranslate
                 if (string.IsNullOrEmpty(text)) return;
 
                 VoiceCache[e.Voice] = text;
-                Logger.Log(LogLevel.Debug, $"[YotogiSubtitles] Text ({text}) for voice '{e.Voice}' loaded.");
+                Logger.Log(LogLevel.Debug, $"Text ({text}) for voice '{e.Voice}' loaded.");
             }
             catch (Exception ex)
             {
@@ -157,14 +156,14 @@ namespace Kanro.MaidTranslate
             switch (Event.current.keyCode)
             {
                 case KeyCode.F1:
-                    Config.Reload();
-                    Logger.Log(LogLevel.Info, $"[YotogiSubtitles] Config reloaded.");
-                    Logger.Log(LogLevel.Info, $"[YotogiSubtitles] Subtitles {(Config.EnableSubtitle ? "Enabled" : "Disabled")}.");
-                    Logger.Log(LogLevel.Info, $"[YotogiSubtitles] Max subtitles {Config.MaxSubtitle }.");
+                    SubtitleConfig.Reload();
+                    Logger.Log(LogLevel.Info, $"Config reloaded.");
+                    Logger.Log(LogLevel.Info, $"Subtitles {(SubtitleConfig.EnableSubtitle ? "Enabled" : "Disabled")}.");
+                    Logger.Log(LogLevel.Info, $"Max subtitles {SubtitleConfig.MaxSubtitle }.");
                     break;
                 case KeyCode.F2:
-                    Config.EnableSubtitle = !Config.EnableSubtitle;
-                    Logger.Log(LogLevel.Info, $"[YotogiSubtitles] Subtitles {(Config.EnableSubtitle ? "Enabled" : "Disabled")}.");
+                    SubtitleConfig.EnableSubtitle = !SubtitleConfig.EnableSubtitle;
+                    Logger.Log(LogLevel.Info, $"Subtitles {(SubtitleConfig.EnableSubtitle ? "Enabled" : "Disabled")}.");
                     break;
                 case KeyCode.Keypad1:
                     lock (PlayingAudioSource)
@@ -173,7 +172,7 @@ namespace Kanro.MaidTranslate
                         foreach (var audioFileName in PlayingAudio)
                         {
                             var audioSource = PlayingAudioSource[audioFileName];
-                            Logger.Log(LogLevel.Debug, $"[YotogiSubtitles] {index} : Now playing {audioFileName}({audioSource.isPlaying})");
+                            Logger.Log(LogLevel.Debug, $"{index} : Now playing {audioFileName}({audioSource.isPlaying})");
                             index++;
                         }
                     }
@@ -187,7 +186,7 @@ namespace Kanro.MaidTranslate
             {
                 OnKeyShort();
 
-                if (!Config.EnableSubtitle) return;
+                if (!SubtitleConfig.EnableSubtitle) return;
 
                 if (BoxStyle == null)
                 {
@@ -262,7 +261,7 @@ namespace Kanro.MaidTranslate
 
                         if (!VoiceCache.ContainsKey(audioFileName)) continue;
 
-                        if (Config.MaxSubtitle > 0 && rendered >= Config.MaxSubtitle) continue;
+                        if (SubtitleConfig.MaxSubtitle > 0 && rendered >= SubtitleConfig.MaxSubtitle) continue;
                         
                         GUILayout.Box(VoiceCache[audioFileName], BoxStyle);
                         rendered++;
@@ -270,7 +269,7 @@ namespace Kanro.MaidTranslate
 
                     foreach (var audioSource in StoppedAudio)
                     {
-                        Logger.Log(LogLevel.Debug, $"[YotogiSubtitles] {audioSource} Stopped.");
+                        Logger.Log(LogLevel.Debug, $"{audioSource} Stopped.");
                         PlayingAudioSource.Remove(audioSource);
                     }
                     StoppedAudio.Clear();

@@ -9,12 +9,12 @@ using Kanro.MaidTranslate.Hook;
 using Kanro.MaidTranslate.Util;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Logger = BepInEx.Logger;
 
 namespace Kanro.MaidTranslate.Translation
 {
     public class TranslationResource
     {
+        private static readonly ManualLogSource Logger = BepInEx.Logging.Logger.CreateLogSource("TranslationResource");
         private static readonly string TranslationDir = @"BepInEx\MaidTranslate";
         private static readonly string TextTranslationDir = $"{TranslationDir}\\Text";
         private static readonly string TextureTranslationDir = $"{TranslationDir}\\Texture";

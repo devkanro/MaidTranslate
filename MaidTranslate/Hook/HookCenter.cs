@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using BepInEx.Logging;
 using UnityEngine;
 using UnityEngine.UI;
-using Logger = BepInEx.Logger;
 
 namespace Kanro.MaidTranslate.Hook
 {
     public static class HookCenter
     {
+        private static readonly ManualLogSource Logger = BepInEx.Logging.Logger.CreateLogSource("HookCenter");
         private static readonly byte[] EmptyTextureData = new byte[0];
 
         public static void Text_SetText(int tag, Text control, ref String value)

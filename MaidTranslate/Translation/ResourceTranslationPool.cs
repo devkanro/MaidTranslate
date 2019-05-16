@@ -7,12 +7,12 @@ using BepInEx.Logging;
 using Kanro.MaidTranslate.Hook;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Logger = BepInEx.Logger;
 
 namespace Kanro.MaidTranslate.Translation
 {
     public class ResourceTranslationPool
     {
+        private static readonly ManualLogSource Logger = BepInEx.Logging.Logger.CreateLogSource("ResourceTranslationPool");
         public Dictionary<string, string> Resource { get; } = new Dictionary<string, string>();
 
         public void AddResource(string path)

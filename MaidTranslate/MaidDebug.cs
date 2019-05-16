@@ -7,11 +7,10 @@ using BepInEx.Logging;
 using Kanro.MaidTranslate.Hook;
 using Kanro.MaidTranslate.Util;
 using UnityEngine;
-using Logger = BepInEx.Logger;
 
 namespace Kanro.MaidTranslate
 {
-    [BepInPlugin(GUID: "MaidTranslate", Name: "Kanro.MaidDebug", Version: "0.3")]
+    [BepInPlugin(GUID: "MaidDebug", Name: "Kanro.MaidDebug", Version:"5.0")]
     public class MaidDebug : BaseUnityPlugin
     {
         public void OnGUI()

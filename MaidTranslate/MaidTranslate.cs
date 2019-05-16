@@ -9,14 +9,13 @@ using Kanro.MaidTranslate.Translation;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using Logger = BepInEx.Logger;
 
 namespace Kanro.MaidTranslate
 {
-    [BepInPlugin(GUID: "MaidTranslate", Name: "Kanro.MaidTranslate", Version: "0.3")]
+    [BepInPlugin(GUID: "MaidTranslate", Name: "Kanro.MaidTranslate", Version:"5.0")]
     public class MaidTranslate : BaseUnityPlugin
     {
-        public TranslateConfig Config { get; }
+        public TranslateConfig TranslateConfig { get; }
 
         public TranslationResource Resource { get; }
 
@@ -30,8 +29,8 @@ namespace Kanro.MaidTranslate
         {
             try
             {
-                Config = new TranslateConfig(this);
-                Dumper = new ResourceDumper(Config);
+                TranslateConfig = new TranslateConfig(Config);
+                Dumper = new ResourceDumper(TranslateConfig);
                 Resource = new TranslationResource();
 
                 HookCenter.TextTranslation += OnTextTranslation;
@@ -50,7 +49,7 @@ namespace Kanro.MaidTranslate
 
         public void Start()
         {
-            Logger.Log(LogLevel.Debug, $"[MaidTranslate] Plugin initialized.");
+            Logger.Log(LogLevel.Debug, $"Plugin initialized.");
         }
 
         public void Update()
@@ -67,27 +66,27 @@ namespace Kanro.MaidTranslate
                 switch (Event.current.keyCode)
                 {
                     case KeyCode.F1:
-                        Config.Reload();
+                        TranslateConfig.Reload();
                         Resource.Reload();
                         ReTranslation();
-                        Logger.Log(LogLevel.Info, $"[MaidTranslate] Config reloaded.");
+                        Logger.Log(LogLevel.Info, $"Config reloaded.");
                         break;
 
                     case KeyCode.F5:
-                        Config.IsDumpingText = !Config.IsDumpingText;
-                        Logger.Log(LogLevel.Info, $"[MaidTranslate] Dumping text {(Config.IsDumpingText ? "Enabled" : "Disabled")}.");
+                        TranslateConfig.IsDumpingText = !TranslateConfig.IsDumpingText;
+                        Logger.Log(LogLevel.Info, $"Dumping text {(TranslateConfig.IsDumpingText ? "Enabled" : "Disabled")}.");
                         break;
                     case KeyCode.F6:
-                        Config.IsDumpingTexture = !Config.IsDumpingTexture;
-                        Logger.Log(LogLevel.Info, $"[MaidTranslate] Dumping texture {(Config.IsDumpingTexture ? "Enabled" : "Disabled")}.");
+                        TranslateConfig.IsDumpingTexture = !TranslateConfig.IsDumpingTexture;
+                        Logger.Log(LogLevel.Info, $"Dumping texture {(TranslateConfig.IsDumpingTexture ? "Enabled" : "Disabled")}.");
                         break;
                     case KeyCode.F7:
-                        Config.IsDumpingUI = !Config.IsDumpingUI;
-                        Logger.Log(LogLevel.Info, $"[MaidTranslate] Dumping ui {(Config.IsDumpingUI ? "Enabled" : "Disabled")}.");
+                        TranslateConfig.IsDumpingUI = !TranslateConfig.IsDumpingUI;
+                        Logger.Log(LogLevel.Info, $"Dumping ui {(TranslateConfig.IsDumpingUI ? "Enabled" : "Disabled")}.");
                         break;
                     case KeyCode.F8:
-                        Config.IsDumpingSprite = !Config.IsDumpingSprite;
-                        Logger.Log(LogLevel.Info, $"[MaidTranslate] Dumping sprite {(Config.IsDumpingSprite ? "Enabled" : "Disabled")}.");
+                        TranslateConfig.IsDumpingSprite = !TranslateConfig.IsDumpingSprite;
+                        Logger.Log(LogLevel.Info, $"Dumping sprite {(TranslateConfig.IsDumpingSprite ? "Enabled" : "Disabled")}.");
                         break;
 
                     case KeyCode.F9:
@@ -117,7 +116,7 @@ namespace Kanro.MaidTranslate
                 SceneManager.sceneLoaded -= OnSceneLoaded;
 
                 Dumper.Dispose();
-                Logger.Log(LogLevel.Debug, $"[MaidTranslate] Plugin destroyed.");
+                Logger.Log(LogLevel.Debug, $"Plugin destroyed.");
             }
             catch (Exception ex)
             {
@@ -133,7 +132,7 @@ namespace Kanro.MaidTranslate
                 CurrentScene = arg0;
                 OriginalTextCache.Clear();
                 ReTranslation();
-                Logger.Log(LogLevel.Debug, $"[MaidTranslate] Scene '{arg0.name}({arg0.buildIndex})' loaded in {arg1} mode.");
+                Logger.Log(LogLevel.Debug, $"Scene '{arg0.name}({arg0.buildIndex})' loaded in {arg1} mode.");
             }
             catch (Exception ex)
             {
@@ -148,7 +147,7 @@ namespace Kanro.MaidTranslate
             {
                 if (OriginalTextCache.ContainsKey(e.Text))
                 {
-                    if (Config.IsDumpingText)
+                    if (TranslateConfig.IsDumpingText)
                     {
                         e.Text = OriginalTextCache[e.Text];
                     }
@@ -180,7 +179,7 @@ namespace Kanro.MaidTranslate
             if (Resource.TranslateTexture(CurrentScene, e, out var resource))
             {
                 e.Translation = resource;
-                Logger.Log(LogLevel.Debug, $"[MaidTranslate] Texture '{e.Name}' translated.");
+                Logger.Log(LogLevel.Debug, $"Texture '{e.Name}' translated.");
             }
         }
 
@@ -190,7 +189,7 @@ namespace Kanro.MaidTranslate
             {
                 if (Dumper.DumpTexture(CurrentScene, e))
                 {
-                    Logger.Log(LogLevel.Debug, $"[MaidTranslate] Texture '{e.Name}' dumped.");
+                    Logger.Log(LogLevel.Debug, $"Texture '{e.Name}' dumped.");
                 }
             }
             catch (Exception ex)
@@ -204,7 +203,7 @@ namespace Kanro.MaidTranslate
             if (Resource.TranslateUI(CurrentScene, e, out var resource))
             {
                 e.Translation = resource;
-                Logger.Log(LogLevel.Debug, $"[MaidTranslate] UI '{e.Name}' translated.");
+                Logger.Log(LogLevel.Debug, $"UI '{e.Name}' translated.");
             }
             else
             {
@@ -212,7 +211,7 @@ namespace Kanro.MaidTranslate
                 {
                     if (Dumper.DumpUI(CurrentScene, e))
                     {
-                        Logger.Log(LogLevel.Debug, $"[MaidTranslate] UI '{e.Name}' dumped.");
+                        Logger.Log(LogLevel.Debug, $"UI '{e.Name}' dumped.");
                     }
                 }
                 catch (Exception ex)
@@ -226,14 +225,14 @@ namespace Kanro.MaidTranslate
         {
             if (string.IsNullOrEmpty(e.Name))
             {
-                Logger.Log(LogLevel.Debug, $"[MaidTranslate] Sprite({(sender as Image)?.name}) skipped due to name is empty.");
+                Logger.Log(LogLevel.Debug, $"Sprite({(sender as Image)?.name}) skipped due to name is empty.");
                 return;
             }
 
             if (Resource.TranslateSprite(CurrentScene, e, out var resource))
             {
                 e.Translation = resource;
-                Logger.Log(LogLevel.Debug, $"[MaidTranslate] Sprite '{e.Name}' translated.");
+                Logger.Log(LogLevel.Debug, $"Sprite '{e.Name}' translated.");
             }
             else
             {
@@ -241,7 +240,7 @@ namespace Kanro.MaidTranslate
                 {
                     if (Dumper.DumpSprite(CurrentScene, e))
                     {
-                        Logger.Log(LogLevel.Debug, $"[MaidTranslate] Sprite '{e.Name}' dumped.");
+                        Logger.Log(LogLevel.Debug, $"Sprite '{e.Name}' dumped.");
                     }
                 }
                 catch (Exception ex)
@@ -261,7 +260,7 @@ namespace Kanro.MaidTranslate
                 {
                     if (Resource.TranslateResource(CurrentScene, (Texture2D)texture))
                     {
-                        Logger.Log(LogLevel.Debug, $"[MaidTranslate] Resource '{texture.name}' translated.");
+                        Logger.Log(LogLevel.Debug, $"Resource '{texture.name}' translated.");
                     }
                 }
                 catch (Exception ex)

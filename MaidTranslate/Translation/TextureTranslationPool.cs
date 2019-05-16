@@ -8,12 +8,12 @@ using Kanro.MaidTranslate.Hook;
 using Kanro.MaidTranslate.Util;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Logger = BepInEx.Logger;
 
 namespace Kanro.MaidTranslate.Translation
 {
     public class TextureTranslationPool
     {
+        private static readonly ManualLogSource Logger = BepInEx.Logging.Logger.CreateLogSource("TextureTranslationPool");
         public Dictionary<string, string> Resource { get; } = new Dictionary<string, string>();
 
         public void AddResource(string path)

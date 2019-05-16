@@ -12,7 +12,7 @@ namespace Kanro.MaidTranslate
     {
         public static IEnumerable<string> TargetDLLs { get; } = new[] { "UnityEngine.UI.dll", "Assembly-CSharp.dll" };
 
-        private static AssemblyDefinition pluginAssembly = AssemblyDefinition.ReadAssembly(@"BepInEx\MaidTranslate.dll");
+        private static AssemblyDefinition pluginAssembly = AssemblyDefinition.ReadAssembly(@"BepInEx\plugins\MaidTranslate.dll");
         private static TypeDefinition hookCenter = pluginAssembly.MainModule.GetType($"Kanro.MaidTranslate.Hook.{nameof(HookCenter)}");
 
         public static void Patch(AssemblyDefinition assembly)
